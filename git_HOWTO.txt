@@ -1,0 +1,480 @@
+ git config --list
+ user.name=
+ user.email=
+
+
+Hierarchical:
+  System -> user -> report
+System level configurationj
+---------------------------
+git config --system
+    in /etc/gitconfig
+
+user level
+    git config --global
+    in ~/.gitconfig
+
+repo level config
+    git config
+    in .git/config in each repo
+
+==========
+git config --global core.editor vim
+
+git config --global help.autocorrect 1
+
+git config --global color.ui auto
+
+# CR/LF interpretation
+git config --global core.autocrlf true|false|input
+
+======
+repo config
+===========
+
+git config user.name "new name"
+
+git config --list
+
+===========================
+
+
+create .git directory, containing repo and metadata
+    git init
+
+add file to repo
+    git add <filename>
+add updated files
+    git add -u (-u to ONLY add updated files to staging)
+add new files
+    git add -A (adds ALL files to staging, ready to be committed)
+
+status of repo
+    git status
+
+save changes to files to repo
+    git commit
+    (creates a SHA1 for commits)
+
+Diffs between commits
+    git diff <a_SHA1>..<a_SHA1>
+    git diff HEAD~1..HEAD
+    [HEAD is the latest. HEAD tilde 1 is HEAD minus 1]
+Diff short form for latest changes
+    git diff HEAD~1
+        shows changes between HEAD~1 and HEAD (recent changes)
+
+history of changes
+    git log
+    git log --oneline
+        condensed log
+    git --shortlog
+        shorter form of commit
+    git --shortlog -sne
+        : author name, email, number of commts
+    git log --graph --online --all --decorate
+        : inc tags, branches, etc.
+add alias:
+    git config --global alias.logall "log --graph --oneline --all --decorate"
+        : git logall
+        : recorded in .git/config file
+
+
+
+Last commit made
+    git show HEAD
+        : show last commit made
+    git show HEAD~1
+        : shows commit previous to HEAD
+    git show <a_SHA1_hash>
+        : show changes at particular SHA1 commit
+
+=======
+REMOTE
+=======
+git remote
+
+git remote -v
+    : shows push and fetch URL
+    : empty for local repo with no remote
+
+git remote add origin [list of https://github.com/...git]
+    : add a remote repo for the local repo "origin" can be any name
+    : "origin" is the name given for the remote repo
+    : origin/master is the name of the remote branch of the repo
+
+git fetch
+    : pull down any changes from the remote repo(s)
+    : into the remote brach
+
+git fetch origin  
+    : pull down or fetch from remote named "origin"
+    : into remote branch origin/master
+
+git log
+    : shows local repo changes
+git log origin/master
+    : show log on remote branch - on origin/master
+    : not in local repo
+git merge <from_remote_branch> <to_local_branch>
+git merge origin/master
+    : merge from remote branch to local repo
+git branch -r
+    : shows remote branch from which local repo merged
+
+git fetch; get merge origin/master
+    : commonly done
+    : also called git pull
+
+git pull
+    : fetched from remote branch, merges to local repo
+    : but does not set up local-remote repo correlation
+
+
+=========== 
+update remote
+=============
+git fetch
+    : pulls into remote branch but not merged into local repo
+
+============
+Set up local to remote/upstream branches
+What remote branch does local branch mirror?
+=================
+git branch --set-upstream <local_branch> <remote_branch>
+git branch --set-upstream master origin/master
+    : set correspondence between local master branch and remote (origin) master
+
+TO explicit pull from a remote branch
+git pull <remote_repo> <remote_branch>
+git pull origin master
+
+=======
+Branches
+======
+git branch
+    : show current branches
+
+git branch -r
+    : show remote branches
+ 
+Branches are used for temporary working copy
+Tags are used for stable checkpoints
+
+git tags
+    : shows all tags
+
+===========================
+HOW TO Stage changes as separate changes - separate bug fix from feature
+===========================
+If files are separate, use separate "add" and "commits" to save 
+them in staging area
+    git add <changed+fileset1>
+    git commit -m "stage fileset1"
+
+    git add <changed+fileset2>
+    git commit -m "stage fileset2"
+
+HOW TO delete file
+=====================
+rm <file>
+git status
+git add -u (add changes to staging area)
+
+HOW TO rename file
+==================
+mv file1 file2
+git status
+git add -u
+git status
+    : git detects rename based on contents
+
+
+HOW TO Undo changes
+===================
+
+git checkout <file>
+    : pull file out of repo
+    : gets HEAD version
+
+
+git reset --hard
+    : remove all changes made in local files
+git reset --hard HEAD~1
+    : remove last commit and DISCARD all changes (use --soft to update)
+
+git reset --soft HEAD~1
+    : remove last commit out of the repo
+    : all changes made have been moved back in staging area to make
+    : further corrections, and recommit
+
+git status
+
+=========================
+Remove temporary files
+=====================
+git clean -n
+    : show result of clean, but dn't perform action
+
+git clean -f
+    : cleans out repo
+
+git status
+
+========================
+Log directory, log files
+==================
+.gitignore
+    : file in root, specifies files to ignore
+
+
+
+=========
+Clone
+======
+git clone
+    : sets up local to remote branch correspondences
+
+============
+Push changes from local to remote repo
+================
+git commit -am "add any updates, message"
+    : save changes to staging area
+
+git status
+    : shows changes with HEAD in remote
+
+
+git remote rm origin
+    : remove the remote upstream repo
+
+git remote -v
+    : shows remote origin
+
+git remote add origin git@github.com:<git_path>
+    : to use ssh to push
+    : configure ssh keys and authorize ssh in remote github.com
+    : avoid username.password required when using http to push
+
+git push
+
+
+============
+Tagging
+===================
+git tag v1.0
+    : creates unsigned tag current local repo state as v1.0
+
+git tag v1.0 -m "message"
+    : creates unsigned tag
+
+git tag -s v1.0.signed
+    : signed tag
+    : need passphrase
+
+git tag
+    : lists tags
+
+git tag -v v1.0_unsigned
+    : cannot verify as unsigned
+
+
+===============
+Pushing tags to remote
+=============
+git push
+    : by defaukt does not push tags
+
+git push --tags
+    : pushes tags to remote repo
+
+tagging gives stabkle points in source code
+
+=================
+lab
+==============
+pulling changes from remote and collaborators
+make changes
+push changes to remote
+
+
+===============================
+Local branching - feature dev
+===============================
+
+git branch feature1
+git checkout feature1
+    : now in feature1 branch context
+
+branches are labels on the SHA1 commits
+branches follow the commits
+    HEAD always points to the latest commit of the branch
+
+tags stay with the commit
+
+
+git branch fix1 <a_SHA1>
+    : create branch
+git checkout fix1
+    : in branch fix1 context
+
+-----
+move or rename branch
+------
+git checkout master
+
+git branch -m fix1 bug1234
+    : move or rename branch
+
+git branch -d bug1234
+    : error if branch is not fully merged
+git branch -D bug1234
+    : force delete
+
+==========
+git checkout master
+    : swithc to master bracnh
+git checkout -b feature2
+    : switch to a new branch feature2 off of master branch
+
+=================
+git reflog
+    : reference log of where HEAD pointed
+
+To revert or create a branch off of an old commit
+git branch bug1234 <a_SHA1_commit>
+    : creates a branch label bug1234 off of that commit
+git show HEAD
+    : shows the commit
+
+=======
+git garbage collection
+==
+cleans up commits after 30 days
+
+========================
+Stashing changes - temporary holding area of changes, not committed but
+do not want to lose
+===============
+git stash
+    : stashes changes, rolls back the changes in local
+git stash list
+    : shows the pending/stashed away changes
+    : stash is a stack of changes
+
+git stash apply
+    : apply changes from stash to the branch
+
+git stash pop  
+    : applies stash changes and REMOVES from stash
+
+git stash drop
+    : dtops the top stash item
+
+git stash branch feature2_name
+    : creates a branch of stashes
+
+
+
+
+===========
+MERGE branches
+======
+fast forward merge  
+    : take the master label and move to a new location
+
+git checkout master
+git merge <branch-name>
+    : merges branch with master
+git merge feature1
+
+git branch -d feature1
+    : delete feature1 commits after merge
+
+Merge conflicts
+git merge feature2
+    : conflicts are recorded int he file
+
+Resolve merge conflict:
+    : use editor to resolve conflict
+git mergetool
+    : launches mergetool for merging
+
+git diff --cached
+    : shows compare repo to staging area
+
+git commit -m "merge resolved conflict"
+
+(remove file.orig files)
+
+=============
+Create branch of a tag
+===============
+git branch feature3 v1.0
+    : create label feature23 branch of tag v1.0
+git checkout feature3
+    : switch to feature3 branch
+git commit -am "add code to feature3"
+    
+git logall
+
+git show feature3
+
+To make feature3 changes appear as made from master branch,
+use rebase:
+git checkout feature3
+git rebase master
+    : move feature3 branch to master
+    : feature3 added on top of master
+
+git checkout master
+git merge feature3
+    : just fast forward to feature3
+
+Rebase can produce merge conflict
+resolve merge conflict
+git rebase --continue
+    : to continue the merge
+resolve any additional conflicts
+
+Then,
+git checkout master
+git merge feature3
+    : fast forward merge
+
+To apply just one commit
+=======
+cherry-pick
+
+git checkout master
+git cherry-pick <a_commit_SHA1>
+    : when rebase or merge does not apply
+
+
+git push <name_of_remote> <name_of_local_branch>
+git push origin master
+git push origin v1.0_fixes
+
+git branch -r
+
+
+CLI git
+==========
+
+Go to source directory: cd <project_sources_dir>
+Initialize it as a git repo: “git init”
+Create dot-gitignore file to ignore output files: “vi .gitignore”
+Insert lines without quotes: “*.class”, “*.o”
+Add all source files to the repo: “git add -A”
+Check status of the repo: “git status”
+Use curl to create the remote repo to push your local sources:
+curl -u ‘<your_userid_for_github_com>’ -X POST -d ‘{“name” : “<repo_name>”}' https://api.github.com/user/repos
+Set <repo_name> created as remote origin for your local repo:
+git remote add origin https://github.com/<your_userid>/<repo_name>.git
+Check remote settings of your local repo: “git remote -v”
+Push your “master” sources to the remote “origin”
+git push -u origin master
+Done! It has been “Git-ized!”
+Now, edit sources, git status, git commit -a “<describe changes>”, and git push -u origin master to keep remote updated.
+
+
