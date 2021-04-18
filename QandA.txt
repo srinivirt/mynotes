@@ -1,0 +1,76 @@
+Q. What editors have you used?
+A. Text editors: vi or vim on Linux, Text Editor on MacOS, Notepad
+   on Windows
+   I am not familiar with GNU Emacs text editor.
+
+Q. What is a Shell?
+A. A Shell is a Command Interpreter program.
+   It takes a command as input, executes it.
+	 In interactive mode, a shell displays a prompt string, such as $ or #,
+	 for users to enter the command along with the arguments, executes the 
+	 commands in the environment.
+
+	 In non-interactive mode, a shell runs a script, a file containaing commands
+	 to be executed.
+
+Q. What is Environment?
+A. The context in which a program runs is called the Environment.
+   The Shell creates an Environment, which can be customized by the user,
+	 for programs to be executed.
+	 Environment settings are Key=Value pairs, where Key is the name of
+	 the Environment Variable Name, and Value is the value it is set to.
+	 For example,
+	 PATH is an environment variable. It is set to a ":" colon-separated list
+	 of directories where the Shell searches for the command entered by the
+	 user to be executed.
+
+Q. How can you access Environment from the program?
+A. Yes. In C and C++, the function getenv() and setenv() can be used to
+   get and set Environment variable by their names as "key".
+
+	 In Java, the environment variables can be accessed using the System
+	 class method, System.getenv(). The configurations are stored in
+	 Properties object which can be accessed usign System.getProperty() method.
+
+	 In Python, the os.environ is a map object that contains the environment
+	 settings. For exaple, os.environ['PATH'] returns value of PATH variable.
+	 The os.getenv() and os.putenv() can also be used to access environment.
+
+Q. What is an Operating System?
+A. An Operating System is a collection of process running in supervisor or
+   privileged mode that manages the hardware resources and user application
+	 processes. 
+	 Examples of functions performed by an Operating System:
+	 Hardware Management: Initializes hardware, handles interrupts
+	 Memory Management: Initializes memory, manages memory as 'pages', allocates
+	    and deallocates (free) pages of memory to user applications, creates
+			memory Address Space for each process so they do not write into
+			other processes, etc.
+	 Process Management: Allows multiple processes to share hardware by scheduling
+	    ONE process to be run at a time on CPU. Processes are switched off the
+			CPU after their time expires - called Time-Sharing Multi-Programming.
+			The switching of processes is called Context Switch.
+
+Q. What is a Device Driver?
+A. A device driver is an Operating System module, also called a kernel module,
+   that contains code to initialize and manage a specific type of devices.
+	 For example, disk device drivers are modules to manage disk devices,
+	 USB device driver are modules to manage USB attached devices, network
+	 drivers are modules for network devices, graphics or video device drivers
+	 are modules that manage display devices, and so on.
+
+Q. Name some Operating Systems.
+A. Major operating systems are Linux which is a Unix-type of Operating System
+   that is used to run servers or large enterprise servers.
+	 Windows and MacOS are operating systems used on client systems such as
+	 laptops and desktops.
+	 Windows Server is Windows-like Operating Systems for servers or enterprise
+	 servers.
+	 Linux is an open-source operating system.
+
+Q. What are the different types of Linux?
+A. The major flavors of Linux are: Ubuntu, CentOS, RHEL (Red Hat Enterprise
+   Linux).
+
+
+
