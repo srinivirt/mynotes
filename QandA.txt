@@ -13,6 +13,21 @@ A. A Shell is a Command Interpreter program.
 	 In non-interactive mode, a shell runs a script, a file containaing commands
 	 to be executed.
 
+Q. What is a Shell script?
+A. A script is a program that is interpreted, i.e. executed line-by-line, by
+    an interpreter. The interpreter for the script is specified on the
+    first line called the "shebang" or "bang" line that startes with "#!"
+    followed by the path to the interpreter.
+    For example, this shebang line specifies /bin/bash, as the path to the
+    bash shell interpreter: #!/bin/bash
+    
+    Python scripts also use the shebang line to use the python3 or python2 
+    installed in the environment the script is executed, For example,
+        #!/usr/bin/env python3
+    is used to use python3 installed in the environment as the path of the
+    python3 interpreter may vary from one user environment to another and
+    from system to system.
+
 Q. What is Environment?
 A. The context in which a program runs is called the Environment.
    The Shell creates an Environment, which can be customized by the user,
@@ -72,5 +87,6 @@ Q. What are the different types of Linux?
 A. The major flavors of Linux are: Ubuntu, CentOS, RHEL (Red Hat Enterprise
    Linux).
 
+Q. 
 
 
