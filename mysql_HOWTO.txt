@@ -1,0 +1,462 @@
+MySQL HOWTO
+============
+>>> Is mysqld MySQL service daemon process running?
+sudo systemctl status mysqld.service
+[sudo] password for delldell: 
+● mysqld.service - MySQL 8.0 database server
+   Loaded: loaded (/usr/lib/systemd/system/mysqld.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+>>>> It is inactive and dead!
+
+>>> 1. Connect to DB (will fail if the mysqld service daemon is not running)
+sudo mysql -u root -p
+Enter password: acct4mysql
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+
+>>> Start mysqld daemon service, retry:
+
+sudo systemctl start mysqld.service
+
+>>>> Start mysql shell, login, it connects to mysqld daemon server process:
+sudo mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.21 Source distribution
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.01 sec)
+
+mysql> 
+
+mysql> show tables;
+ERROR 1046 (3D000): No database selected
+mysql> connect mysql;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Connection id:    9
+Current database: mysql
+
+mysql> show tables;
++---------------------------+
+| Tables_in_mysql           |
++---------------------------+
+| columns_priv              |
+| component                 |
+| db                        |
+| default_roles             |
+| engine_cost               |
+| func                      |
+| general_log               |
+| global_grants             |
+| gtid_executed             |
+| help_category             |
+| help_keyword              |
+| help_relation             |
+| help_topic                |
+| innodb_index_stats        |
+| innodb_table_stats        |
+| password_history          |
+| plugin                    |
+| procs_priv                |
+| proxies_priv              |
+| role_edges                |
+| server_cost               |
+| servers                   |
+| slave_master_info         |
+| slave_relay_log_info      |
+| slave_worker_info         |
+| slow_log                  |
+| tables_priv               |
+| time_zone                 |
+| time_zone_leap_second     |
+| time_zone_name            |
+| time_zone_transition      |
+| time_zone_transition_type |
+| user                      |
++---------------------------+
+33 rows in set (0.00 sec)
+
+mysql> 
+
+mysql> select User from user;
++------------------+
+| User             |
++------------------+
+| mysql.infoschema |
+| mysql.session    |
+| mysql.sys        |
+| root             |
++------------------+
+4 rows in set (0.01 sec)
+
+mysql> select current_user();
++----------------+
+| current_user() |
++----------------+
+| root@localhost |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> 
+
+mysql> select current_role();
++----------------+
+| current_role() |
++----------------+
+| NONE           |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> 
+
+mysql> show schemas;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> 
+
+In MySQL a user is 'userid'@'host'
+
+mysql> create user 'testapp1'@'localhost' IDENTIFIED BY 'pwd4testapp1';
+ERROR 1819 (HY000): Your password does not satisfy the current policy requirements
+
+mysql> show variables like 'validate_password%';
++--------------------------------------+--------+
+| Variable_name                        | Value  |
++--------------------------------------+--------+
+| validate_password.check_user_name    | ON     |
+| validate_password.dictionary_file    |        |
+| validate_password.length             | 8      |
+| validate_password.mixed_case_count   | 1      |
+| validate_password.number_count       | 1      |
+| validate_password.policy             | MEDIUM |
+| validate_password.special_char_count | 1      |
++--------------------------------------+--------+
+7 rows in set (0.16 sec)
+
+TO modify validate_password settings:
+SET GLOBAL validate_password.length = 6;
+SET GLOBAL validate_password.number_count = 0;
+
+mysql> CREATE USER 'testapp1'@'localhost' IDENTIFIED BY 'Pwd4Testapp1!';
+Query OK, 0 rows affected (0.47 sec)
+mysql> select User from user;
++------------------+
+| User             |
++------------------+
+| mysql.infoschema |
+| mysql.session    |
+| mysql.sys        |
+| root             |
+| testapp1         |
++------------------+
+5 rows in set (0.00 sec)
+
+
+mysql> CREATE DATABASE testapp1;
+Query OK, 1 row affected (0.15 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| testapp1           |
++--------------------+
+5 rows in set (0.00 sec)
+
+mysql> SHOW GRANTS FOR 'testapp1'@'localhost';
++----------------------------------------------+
+| Grants for testapp1@localhost                |
++----------------------------------------------+
+| GRANT USAGE ON *.* TO `testapp1`@`localhost` |
++----------------------------------------------+
+1 row in set (0.01 sec)
+
+mysql> GRANT ALL ON testapp1.* TO 'testapp1'@'localhost';
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> SHOW GRANTS FOR 'testapp1'@'localhost';
++----------------------------------------------------------------+
+| Grants for testapp1@localhost                                  |
++----------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `testapp1`@`localhost`                   |
+| GRANT ALL PRIVILEGES ON `testapp1`.* TO `testapp1`@`localhost` |
++----------------------------------------------------------------+
+2 rows in set (0.00 sec)
+
+Finding the user in the underlysing table
+mysql> SELECT * FROM mysql.user WHERE user='testapp1' and host='localhost';
+
+mysql> select user, host from mysql.user;
++------------------+-----------+
+| user             | host      |
++------------------+-----------+
+| mysql.infoschema | localhost |
+| mysql.session    | localhost |
+| mysql.sys        | localhost |
+| root             | localhost |
+| testapp1         | localhost |
++------------------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> 
+
+mysql> use testapp1;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++--------------------+
+| Tables_in_testapp1 |
++--------------------+
+| users              |
++--------------------+
+1 row in set (0.00 sec)
+
+mysql> describe users;
++---------+--------------+------+-----+---------+----------------+
+| Field   | Type         | Null | Key | Default | Extra          |
++---------+--------------+------+-----+---------+----------------+
+| name    | varchar(255) | YES  |     | NULL    |                |
+| email   | varchar(255) | YES  |     | NULL    |                |
+| age     | int          | YES  |     | NULL    |                |
+| user_id | int          | NO   | PRI | NULL    | auto_increment |
++---------+--------------+------+-----+---------+----------------+
+4 rows in set (0.39 sec)
+
+
+========== next day, restart mysql to check database, continue work
+[delldell@localhost ~]$ sudo mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.21 Source distribution
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+>>>> USE testapp1 DATABASE <<<<<<<<<<<<<
+
+mysql> use testapp1;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> 
+
+mysql> show tables;
++--------------------+
+| Tables_in_testapp1 |
++--------------------+
+| users              |
++--------------------+
+1 row in set (0.00 sec)
+
+>>>>>>>CREATE TABLE t1 (
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  dt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+>>>>> DESCRIBE users TABLE SCHEMA <<<<<<<<<<<<<
+
+mysql> describe users;
++------------+--------------+------+-----+-------------------+-------------------+
+| Field      | Type         | Null | Key | Default           | Extra             |
++------------+--------------+------+-----+-------------------+-------------------+
+| name       | varchar(255) | YES  |     | NULL              |                   |
+| email      | varchar(255) | YES  |     | NULL              |                   |
+| age        | int          | YES  |     | NULL              |                   |
+| user_id    | int          | NO   | PRI | NULL              | auto_increment    |
+| timestamp  | timestamp    | YES  |     | NULL              |                   |
+| timestamp2 | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++------------+--------------+------+-----+-------------------+-------------------+
+6 rows in set (0.00 sec)
+
+
+>>>>>> TIMESTAMP - calculate elapsed time in seconds <<<<<<<
+mysql> select now();
++---------------------+
+| now()               |
++---------------------+
+| 2020-12-03 18:22:39 |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT name, email, user_id, CURDATE(), TIMESTAMPDIFF(SECOND, timestamp2, NOW()) AS elapsed_time FROM users;
++------------+---------------------+---------+------------+--------------+
+| name       | email               | user_id | CURDATE()  | elapsed_time |
++------------+---------------------+---------+------------+--------------+
+| Srinivasan | srinivasan@home.com |       1 | 2020-12-03 |        74586 |
+| Srinivasan | srinivasan@home.com |       2 | 2020-12-03 |        74586 |
+| Srinivasan | srinivasan@home.com |       3 | 2020-12-03 |        74586 |
+| Srinivasan | srinivasan@home.com |       4 | 2020-12-03 |        74586 |
+| Srinivasan | srinivasan@home.com |       8 | 2020-12-03 |        74586 |
+| Srinivasan | srinivasan@home.com |      12 | 2020-12-03 |        74586 |
+| Srinivasan | srinivasan@home.com |      13 | 2020-12-03 |        74559 |
+| Srinivasan | srinivasan@home.com |      17 | 2020-12-03 |         1264 |
+| Srinivasan | srinivasan@home.com |      21 | 2020-12-03 |         1176 |
+| Shanti     | shanti@home.com     |      22 | 2020-12-03 |         1176 |
+| Shruti     | shruti@home.com     |      23 | 2020-12-03 |         1176 |
+| Siddharth  | siddharth@home.com  |      24 | 2020-12-03 |         1176 |
+| Srinivasan | srinivasan@home.com |      25 | 2020-12-03 |          571 |
+| Shanti     | shanti@home.com     |      26 | 2020-12-03 |          570 |
+| Shruti     | shruti@home.com     |      27 | 2020-12-03 |          570 |
+| Siddharth  | siddharth@home.com  |      28 | 2020-12-03 |          570 |
++------------+---------------------+---------+------------+--------------+
+16 rows in set (0.01 sec)
+
+mysql> SELECT name, email, user_id, CURDATE(), TIMESTAMPDIFF(SECOND, timestamp2, NOW()) AS elapsed_time FROM users;
++------------+---------------------+---------+------------+--------------+
+| name       | email               | user_id | CURDATE()  | elapsed_time |
++------------+---------------------+---------+------------+--------------+
+| Srinivasan | srinivasan@home.com |       1 | 2020-12-03 |        74594 |
+| Srinivasan | srinivasan@home.com |       2 | 2020-12-03 |        74594 |
+| Srinivasan | srinivasan@home.com |       3 | 2020-12-03 |        74594 |
+| Srinivasan | srinivasan@home.com |       4 | 2020-12-03 |        74594 |
+| Srinivasan | srinivasan@home.com |       8 | 2020-12-03 |        74594 |
+| Srinivasan | srinivasan@home.com |      12 | 2020-12-03 |        74594 |
+| Srinivasan | srinivasan@home.com |      13 | 2020-12-03 |        74567 |
+| Srinivasan | srinivasan@home.com |      17 | 2020-12-03 |         1272 |
+| Srinivasan | srinivasan@home.com |      21 | 2020-12-03 |         1184 |
+| Shanti     | shanti@home.com     |      22 | 2020-12-03 |         1184 |
+| Shruti     | shruti@home.com     |      23 | 2020-12-03 |         1184 |
+| Siddharth  | siddharth@home.com  |      24 | 2020-12-03 |         1184 |
+| Srinivasan | srinivasan@home.com |      25 | 2020-12-03 |          579 |
+| Shanti     | shanti@home.com     |      26 | 2020-12-03 |          578 |
+| Shruti     | shruti@home.com     |      27 | 2020-12-03 |          578 |
+| Siddharth  | siddharth@home.com  |      28 | 2020-12-03 |          578 |
++------------+---------------------+---------+------------+--------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT name, email, user_id, CURDATE(), TIMESTAMPDIFF(SECOND, timestamp2, NOW()) AS elapsed_time FROM users WHERE user_id = 25;
++------------+---------------------+---------+------------+--------------+
+| name       | email               | user_id | CURDATE()  | elapsed_time |
++------------+---------------------+---------+------------+--------------+
+| Srinivasan | srinivasan@home.com |      25 | 2020-12-03 |          618 |
++------------+---------------------+---------+------------+--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT name, email, user_id, CURDATE(), TIMESTAMPDIFF(SECOND, timestamp2, NOW()) AS elapsed_time FROM users WHERE user_id = 25;
++------------+---------------------+---------+------------+--------------+
+| name       | email               | user_id | CURDATE()  | elapsed_time |
++------------+---------------------+---------+------------+--------------+
+| Srinivasan | srinivasan@home.com |      25 | 2020-12-03 |          651 |
++------------+---------------------+---------+------------+--------------+
+1 row in set (0.01 sec)
+
+mysql> 
+
+===================
+NEXT: FOREIGN KEYS
+Defines relationship between PARENT table (primary key) and CHILD table (dependent)
+CHILD table defines FOREIGN KEY that refers to PARENT table's PRIMARY key
+
+CREATE TABLE users {
+  id INT NOT NULL, PRIMARY KEY (id)
+}
+
+CREATE TABLE citizen {
+  country VARCHAR(255),
+  user_id INT, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+}
+
+When an UPDATE or DELETE operation affects a key value in the parent table that has matching rows in the child table, the result depends on the referential action specified by ON UPDATE and ON DELETE subclauses of the FOREIGN KEY clause. Referential actions include:
+
+CASCADE: Delete or update the row from the parent table and automatically delete or update the matching rows in the child table
+
+===============================
+mysql> select * from parts;
++---------+-------------------+---------------------+
+| part_id | description       | datecreated         |
++---------+-------------------+---------------------+
+|       1 | Part1 electronics | 2020-12-04 20:05:55 |
+|       2 | Part1 electronics | 2020-12-04 20:08:04 |
+|       3 | Foo part          | 2020-12-04 20:08:04 |
+|       4 | Bar part          | 2020-12-04 20:08:04 |
+|       5 | FooBar part       | 2020-12-04 20:08:04 |
+|       6 | Fooz part         | 2020-12-04 20:08:04 |
++---------+-------------------+---------------------+
+6 rows in set (0.00 sec)
+
+mysql> CREATE TABLE purchases (FOREIGN KEY (name_id) REFERENCES users(user_id) ON UPDATE CASCADE,
+    -> FOREIGN KEY (part_id) REFERENCES parts(part_id) ON UPDATE CASCADE);
+ERROR 1113 (42000): A table must have at least 1 column
+
+mysql> CREATE TABLE purchases (entryID INT AUTO_INCREMENT PRIMARY KEY, FOREIGN KEY (name_id) REFERENCES users(user_id) ON UPDATE CASCADE, FOREIGN KEY (part_id) REFERENCES parts(part_id) ON UPDATE CASCADE);
+ERROR 1072 (42000): Key column 'name_id' doesn't exist in table
+
+>>>>>>>>>>>>**********syntax below *********<<<<<<<
+mysql> CREATE TABLE purchases (name_id INT, FOREIGN KEY (name_id) REFERENCES users(user_id) ON UPDATE CASCADE, part_id INT, FOREIGN KEY (part_id) REFERENCES parts(part_id) ON UPDATE CASCADE); 
+Query OK, 0 rows affected (0.66 sec)
+
+mysql> describe users;
++------------+--------------+------+-----+-------------------+-------------------+
+| Field      | Type         | Null | Key | Default           | Extra             |
++------------+--------------+------+-----+-------------------+-------------------+
+| name       | varchar(255) | YES  |     | NULL              |                   |
+| email      | varchar(255) | YES  |     | NULL              |                   |
+| age        | int          | YES  |     | NULL              |                   |
+| user_id    | int          | NO   | PRI | NULL              | auto_increment    |
+| timestamp  | timestamp    | YES  |     | NULL              |                   |
+| timestamp2 | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++------------+--------------+------+-----+-------------------+-------------------+
+6 rows in set (0.00 sec)
+
+mysql> describe purchases;
++---------+------+------+-----+---------+-------+
+| Field   | Type | Null | Key | Default | Extra |
++---------+------+------+-----+---------+-------+
+| name_id | int  | YES  | MUL | NULL    |       |
+| part_id | int  | YES  | MUL | NULL    |       |
++---------+------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+=====================
+
+
+
+
+
+
+
+
+
+
+
